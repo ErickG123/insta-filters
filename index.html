@@ -1,131 +1,189 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Instagram Filters — HTML + JS (Visual Modernizado)</title>
+    <title>Visualizador de Filtros — UI Modernizada</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        glass: 'rgba(255,255,255,0.04)',
+                        accent: {
+                            400: '#22d3ee',
+                            500: '#06b6d4'
+                        }
+                    },
+                    boxShadow: {
+                        'soft-lg': '0 10px 30px rgba(2,6,23,0.6)'
+                    }
+                }
+            }
+        }
+    </script>
+
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-slate-100 min-h-screen py-8">
-    <div class="max-w-7xl mx-auto px-6">
-        <header class="mb-8 flex items-center justify-between">
+
+<body class="min-h-screen text-slate-100">
+    <div class="max-w-7xl mx-auto px-6 py-10">
+        <header class="flex items-start justify-between gap-6 mb-8">
             <div>
-                <h1 class="text-3xl md:text-4xl font-extrabold text-cyan-300">Visualizador de Filtros</h1>
-                <p class="text-sm text-slate-400 mt-1">Upload, aplique filtros estilo Instagram e visualize os cálculos
-                    pixel a pixel.</p>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white leading-tight">Visualizador de Filtros</h1>
+                <p class="mt-2 text-sm muted">Aplique filtros, ajuste saturação/contraste e veja os cálculos por pixel.
+                </p>
             </div>
-            <div class="flex gap-3 items-center">
-                <label class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg cursor-pointer shadow">
-                    Carregar imagem
-                    <input id="fileInput" type="file" accept="image/*" class="hidden" />
+
+            <div class="flex items-center gap-3">
+                <label class="control-pill cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-accent-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v12m0 0l4-4m-4 4-4-4M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    </svg>
+                    <span class="text-sm muted">Carregar imagem</span>
+                    <input id="fileInput" type="file" accept="image/*" class="sr-only" />
                 </label>
-                <button id="downloadBtn"
-                    class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow">Baixar
-                    PNG</button>
-                <button id="resetBtn"
-                    class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-slate-200 shadow">Reset</button>
+
+                <button id="downloadBtn" class="control-pill btn-ghost" title="Baixar imagem">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-300" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v12m0 0l4-4m-4 4-4-4M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    </svg>
+                </button>
+
+                <button id="resetBtn" class="control-pill btn-ghost" title="Resetar">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-200" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-3-6.71M3 3v6h6" />
+                    </svg>
+                </button>
             </div>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <section class="lg:col-span-2 space-y-4">
-                <div class="glass p-4 rounded-2xl border border-slate-800 shadow-lg">
-                    <div class="flex items-center justify-between mb-3 gap-3">
-                        <div class="flex items-center gap-3">
-                            <label class="text-sm text-slate-300">Força</label>
-                            <input id="strength" type="range" min="0" max="1" step="0.01" value="1" class="w-40" />
-                            <span id="strengthVal" class="text-xs text-slate-300 ml-2">100%</span>
+            <section class="lg:col-span-2 space-y-5">
+                <div class="glass-card p-5 rounded-2xl shadow-soft-lg border border-[rgba(255,255,255,0.03)]">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-56">
+                                <label for="strength" class="text-xs muted mb-1 inline-block">Força</label>
+                                <input id="strength" type="range" min="0" max="1" step="0.01" value="1"
+                                    class="w-full" />
+                                <div id="strengthVal" class="text-xs muted mt-1">100%</div>
+                            </div>
+
+                            <div class="w-56">
+                                <label for="saturation" class="text-xs muted mb-1 inline-block">Saturação</label>
+                                <input id="saturation" type="range" min="0" max="2" step="0.01" value="1"
+                                    class="w-full" />
+                                <div id="satVal" class="text-xs muted mt-1">1.00</div>
+                            </div>
+
+                            <div class="w-56">
+                                <label for="contrast" class="text-xs muted mb-1 inline-block">Contraste</label>
+                                <input id="contrast" type="range" min="0.2" max="2" step="0.01" value="1"
+                                    class="w-full" />
+                                <div id="conVal" class="text-xs muted mt-1">1.00</div>
+                            </div>
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <label class="text-sm text-slate-300">Saturação</label>
-                            <input id="saturation" type="range" min="0" max="2" step="0.01" value="1" class="w-40" />
-                            <span id="satVal" class="text-xs text-slate-300 ml-2">1.00</span>
+                            <label class="inline-flex items-center gap-2 muted text-sm">
+                                <input id="showCalc" type="checkbox" checked class="w-4 h-4" />
+                                Mostrar cálculos
+                            </label>
                         </div>
-
-                        <div class="flex items-center gap-3">
-                            <label class="text-sm text-slate-300">Contraste</label>
-                            <input id="contrast" type="range" min="0.2" max="2" step="0.01" value="1" class="w-40" />
-                            <span id="conVal" class="text-xs text-slate-300 ml-2">1.00</span>
-                        </div>
-
-                        <label class="inline-flex items-center text-sm text-slate-300 gap-2">
-                            <input id="showCalc" type="checkbox" checked />
-                            Mostrar cálculos
-                        </label>
                     </div>
 
-                    <div class="rounded-xl overflow-hidden border border-slate-800">
-                        <canvas id="mainCanvas" class="w-full" style="max-height:70vh;"></canvas>
+                    <div class="rounded-xl overflow-hidden border border-[rgba(255,255,255,0.03)]">
+                        <canvas id="mainCanvas" style="width:100%;"></canvas>
                     </div>
                 </div>
 
-                <div class="glass p-4 rounded-2xl border border-slate-800 shadow-lg">
-                    <h3 class="text-sm font-semibold text-slate-200 mb-2">Filtros (pré-visualizações)</h3>
-                    <div id="filtersGrid" class="grid grid-cols-3 md:grid-cols-6 gap-3"></div>
+                <div class="glass-card p-4 rounded-2xl border border-[rgba(255,255,255,0.03)]">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-3">Pré-visualizações</h3>
+                    <div id="filtersGrid" class="grid grid-cols-3 md:grid-cols-6 gap-3">
+                        <div class="filter-tile p-2 bg-[rgba(255,255,255,0.02)] rounded-lg flex flex-col items-center">
+                            <div class="text-xs muted mb-2">Original</div>
+                            <img class="thumb-img" data-filter="original" src="" alt="Original" />
+                        </div>
+                    </div>
                 </div>
 
-                <div id="pixelPanel" class="glass p-4 rounded-2xl border border-slate-800 shadow-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-lg font-semibold text-cyan-200">Cálculos do Pixel (inspeção)</h2>
-                        <div class="text-sm text-slate-400">Passe o mouse sobre a imagem para ver</div>
+                <div id="pixelPanel" class="glass-card p-5 rounded-2xl border border-[rgba(255,255,255,0.03)]">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h4 class="text-lg font-semibold text-white">Cálculos do Pixel</h4>
+                            <div class="text-sm muted">Passe o mouse sobre a imagem para inspecionar um pixel</div>
+                        </div>
+                        <div class="text-xs muted mono">Exibição: <span id="calcMode">Decimal & Bits</span></div>
                     </div>
 
-                    <div id="calcContent" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 pixel-box text-sm">
-                            <div class="text-xs text-slate-400 mb-2">Posição</div>
-                            <div id="posText" class="text-lg font-medium text-slate-100 mb-3">—</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-[rgba(0,0,0,0.45)] p-4 rounded-lg border border-[rgba(255,255,255,0.02)]">
+                            <div class="text-xs muted mb-2">Posição</div>
+                            <div id="posText" class="text-xl font-medium">—</div>
 
-                            <div class="text-xs text-slate-400">Pixel original (0–255)</div>
-                            <div id="origRGB" class="mt-2 text-lg">—</div>
-                            <div id="origBits" class="mt-1 text-slate-400 text-sm">—</div>
+                            <div class="mt-4 text-xs muted">Pixel original (0–255)</div>
+                            <div id="origRGB" class="mt-2 text-lg mono">—</div>
+                            <div id="origBits" class="mt-1 text-sm muted mono">—</div>
                         </div>
 
-                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 pixel-box text-sm">
-                            <div class="text-xs text-slate-400 mb-2">Pipeline (intermediários)</div>
-                            <div class="text-sm text-slate-200 mb-2">
-                                <div><strong>1)</strong> Aplicar filtro (color matrix / formula)</div>
-                                <div id="afterFilter" class="mt-2 text-lg">—</div>
-                            </div>
-                            <div class="text-sm text-slate-200">
-                                <div><strong>2)</strong> Saturação & Contraste</div>
-                                <div id="afterSatCon" class="mt-2 text-lg">—</div>
-                                <div id="afterSatConBits" class="mt-1 text-slate-400 text-sm">—</div>
-                            </div>
-                            <div class="text-sm text-slate-200 mt-3">
-                                <div><strong>3)</strong> Mistura (strength) & arredondamento → valor final</div>
-                                <div id="finalRGB" class="mt-2 text-lg">—</div>
-                                <div id="finalBits" class="mt-1 text-slate-400 text-sm">—</div>
-                            </div>
+                        <div class="bg-[rgba(0,0,0,0.45)] p-4 rounded-lg border border-[rgba(255,255,255,0.02)]">
+                            <div class="text-xs muted mb-2">Pipeline</div>
+
+                            <div class="mt-1 text-sm muted">1) Após aplicar o filtro</div>
+                            <div id="afterFilter" class="text-lg mono mt-2">—</div>
+
+                            <div class="mt-3 text-sm muted">2) Após Saturação & Contraste</div>
+                            <div id="afterSatCon" class="text-lg mono mt-2">—</div>
+                            <div id="afterSatConBits" class="text-sm muted mono mt-1">—</div>
+
+                            <div class="mt-3 text-sm muted">3) Valor final (blend & clamp)</div>
+                            <div id="finalRGB" class="text-lg text-emerald-300 mono mt-2">—</div>
+                            <div id="finalBits" class="text-sm muted mono mt-1">—</div>
                         </div>
                     </div>
 
-                    <div class="mt-4 text-xs text-slate-400">Notas: mostramos números antes e depois das transformações;
-                        quando o canvas grava o pixel o valor é clampado para 0–255 e arredondado para inteiro (byte) —
-                        mostramos os bits de 8 bits também.</div>
+                    <div class="mt-4 text-xs muted">Quando o canvas grava o pixel, os valores são arredondados para
+                        bytes 0–255. Aqui mostramos intermediários em float e o resultado final como inteiro + binário.
+                    </div>
                 </div>
             </section>
 
             <aside class="space-y-4">
-                <div class="glass p-4 rounded-2xl border border-slate-800 shadow-lg">
-                    <h3 class="text-lg font-semibold text-cyan-200 mb-3">Filtros</h3>
-                    <div class="grid grid-cols-1 gap-3">
-                        <div id="filtersList" class="flex flex-col gap-2"></div>
+                <div class="glass-card p-4 rounded-2xl border border-[rgba(255,255,255,0.03)]">
+                    <h3 class="text-lg font-semibold text-slate-100 mb-3">Filtros</h3>
+                    <div id="filtersList" class="flex flex-col gap-3">
                     </div>
                 </div>
 
-                <div class="glass p-4 rounded-2xl border border-slate-800 shadow-lg">
-                    <h4 class="text-sm font-medium text-slate-200 mb-2">Ações</h4>
+                <div class="glass-card p-4 rounded-2xl border border-[rgba(255,255,255,0.03)]">
+                    <h4 class="text-sm font-medium text-slate-100 mb-2">Ações</h4>
                     <div class="flex flex-col gap-2">
                         <button id="genThumbsBtn"
-                            class="px-3 py-2 rounded bg-indigo-600 hover:bg-indigo-500 text-white">Gerar
+                            class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white">Gerar
                             Thumbnails</button>
                         <button id="downloadResultBtn"
-                            class="px-3 py-2 rounded bg-emerald-600 hover:bg-emerald-500 text-white">Download
-                            Resultado</button>
+                            class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white">Baixar
+                            resultado</button>
                     </div>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border border-[rgba(255,255,255,0.03)]">
+                    <h4 class="text-sm font-medium text-slate-100 mb-2">Ajuda rápida</h4>
+                    <ul class="text-sm muted list-disc pl-4">
+                        <li>Carregue uma imagem</li>
+                        <li>Escolha um filtro ou gere miniaturas</li>
+                        <li>Passe o mouse sobre a imagem para inspecionar pixels</li>
+                    </ul>
                 </div>
             </aside>
         </main>
