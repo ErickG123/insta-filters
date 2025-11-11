@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Apresentação - Recriando filtros do Instagram</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#38bdf8',
+                        secondary: '#f0f9ff',
+                        accent: '#0ea5e9'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            background: linear-gradient(180deg, #f9fafb 0%, #e0f2fe 100%);
+            color: #0f172a;
+        }
+
+        .slide {
+            min-height: 60vh;
+        }
+
+        .slides-wrap {
+            display: flex;
+            transition: transform .6s cubic-bezier(.2, .9, .3, 1);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 9999px;
+            opacity: .4;
+        }
+
+        pre {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="app" class="max-w-6xl mx-auto px-6 py-8">
+        <header class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-extrabold text-sky-700">Recriando filtros do Instagram</h1>
+                <p class="mt-1 text-sm text-sky-900/70">Projeto: manipulação direta de pixels - filtros em JS</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="prevBtn" class="px-3 py-2 bg-sky-200 rounded hover:bg-sky-300">◀</button>
+                <button id="nextBtn" class="px-3 py-2 bg-sky-200 rounded hover:bg-sky-300">▶</button>
+            </div>
+        </header>
+
+        <main class="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-sky-100">
+            <div id="slides" class="overflow-hidden">
+                <div id="slidesInner" class="slides-wrap">
+
+                    <!-- Slide 1: Title -->
+                    <section
+                        class="slide w-full flex-shrink-0 px-6 py-12 flex flex-col justify-center items-start gap-4">
+                        <h2 class="text-4xl font-bold text-sky-700">Recriando filtros do Instagram</h2>
+                        <p class="text-lg text-slate-700 max-w-2xl">Explorando como efeitos visuais são gerados
+                            manipulando pixels em RGB, blends e matrizes de cor. Apresentação criada a partir do projeto
+                            em JavaScript usando &lt;canvas&gt;.</p>
+                    </section>
+
+                    <!-- Slide 2: Introdução -->
+                    <section class="slide w-full flex-shrink-0 px-6 py-12">
+                        <h3 class="text-2xl font-semibold mb-3 text-sky-700">Introdução</h3>
+                        <ul class="list-disc pl-5 space-y-2 text-lg text-slate-700">
+                            <li><strong>Objetivo:</strong> compreender e implementar filtros visuais semelhantes aos do
+                                Instagram aplicando transformações por pixel.</li>
+                            <li><strong>Método:</strong> ler ImageData do canvas, aplicar uma transformação (color
+                                matrix, ajustes de saturação/contraste) e escrever de volta.</li>
+                            <li><strong>Por que é relevante:</strong> aprofunda conceitos de processamento de imagem,
+                                blending e efeitos visuais que são usados em apps e editores.</li>
+                        </ul>
+                    </section>
+
+                    <!-- Slide 3: Blending / Overlay / Multiply -->
+                    <section class="slide w-full flex-shrink-0 px-6 py-12">
+                        <h3 class="text-2xl font-semibold mb-3 text-sky-700">Conceitos: Blending, Multiply e Overlay
+                        </h3>
+                        <div class="grid md:grid-cols-3 gap-6 text-slate-700">
+                            <div>
+                                <h4 class="font-semibold text-sky-600">Blending (Mistura)</h4>
+                                <p class="mb-2">Mistura linear entre a cor base e a cor do filtro/camada usando um fator
+                                    t (0–1).</p>
+                                <pre>result = (1 - t) * base + t * blend</pre>
+                                <p class="mt-1">Usado para controlar intensidade do filtro (no seu código:
+                                    <code>mix(a,b,t)</code>).</p>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-sky-600">Multiply (Multiplicação)</h4>
+                                <p class="mb-2">Multiplica os canais de cor entre base e blend - valores normalizados
+                                    0–1.</p>
+                                <pre>result = base * blend</pre>
+                                <p class="mt-1">Efeito: escurece a imagem; preto preservado, branco não altera. Bom para
+                                    sombras e texturas.</p>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-sky-600">Overlay (Sobreposição)</h4>
+                                <p class="mb-2">Combina Multiply e Screen: depende do brilho do pixel base.</p>
+                                <pre>if base &lt; 0.5 → 2*base*blend; else → 1 - 2*(1-base)*(1-blend)</pre>
+                                <p class="mt-1">Efeito: aumenta contraste - reforça sombras e realces mantendo detalhes.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 4: Aden -->
+                    <section class="slide w-full flex-shrink-0 px-6 py-12">
+                        <h3 class="text-2xl font-semibold mb-3 text-sky-700">Filtro: Aden</h3>
+                        <p class="text-slate-700 mb-3">Tom suave e vintage; fica bom em retratos e cenas com cores
+                            pastéis.</p>
+                        <div class="grid md:grid-cols-2 gap-4 text-slate-700">
+                            <div>
+                                <strong>Fórmula aplicada</strong>
+                                <pre>[1.05 * r - 10, 0.95 * g - 6, 0.95 * b - 6]</pre>
+                            </div>
+                            <div>
+                                <strong>Resultado esperado</strong>
+                                <p>Leve aquecimento (mais vermelho), brilho levemente reduzido nas sombras - aparência
+                                    desbotada e suave.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 5: Clarendon -->
+                    <section class="slide w-full flex-shrink-0 px-6 py-12">
+                        <h3 class="text-2xl font-semibold mb-3 text-sky-700">Filtro: Clarendon</h3>
+                        <p class="text-slate-700 mb-3">Filtro de alto contraste; popular para dar impacto às imagens.
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4 text-slate-700">
+                            <div>
+                                <strong>Fórmula aplicada</strong>
+                                <pre>[1.15 * r - 20, 1.05 * g - 10, 1.05 * b - 5]</pre>
+                            </div>
+                            <div>
+                                <strong>Resultado esperado</strong>
+                                <p>Realce de highlights, aumento de saturação e sensação mais vibrante / dramática.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 6: Gingham -->
+                    <section class="slide w-full flex-shrink-0 px-6 py-12">
+                        <h3 class="text-2xl font-semibold mb-3 text-sky-700">Filtro: Gingham</h3>
+                        <p class="text-slate-700 mb-3">Look retrô e lavado - suave e pouco contrastado.</p>
+                        <div class="grid md:grid-cols-2 gap-4 text-slate-700">
+                            <div>
+                                <strong>Fórmula aplicada</strong>
+                                <pre>[0.9 * r + 12, 0.92 * g + 10, 0.92 * b + 8]</pre>
+                            </div>
+                            <div>
+                                <strong>Resultado esperado</strong>
+                                <p>Contraste reduzido, cores levemente amareladas/bege - sensação de foto antiga.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 7: Ludwig -->
+                    <section class="slide w-full flex-shrink-0 px-6 py-12">
+                        <h3 class="text-2xl font-semibold mb-3 text-sky-700">Filtro: Ludwig</h3>
+                        <p class="text-slate-700 mb-3">Aproximação cinematográfica - realça tons quentes e controla
+                            azuis.</p>
+                        <div class="grid md:grid-cols-2 gap-4 text-slate-700">
+                            <div>
+                                <strong>Fórmula aplicada</strong>
+                                <pre>[1.08 * r - 12, 0.98 * g + 2, 0.92 * b + 8]</pre>
+                            </div>
+                            <div>
+                                <strong>Resultado esperado</strong>
+                                <p>Maior presença dos vermelhos, sombras mais marcadas e leve redução de azul - look
+                                    mais dramático.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 8: Moon (B&amp;W) -->
+                    <section class="slide w-full flex-shrink-0 px-6 py-12">
+                        <h3 class="text-2xl font-semibold mb-3 text-sky-700">Filtro: Moon (Preto &amp; Branco)</h3>
+                        <p class="text-slate-700 mb-3">Conversão para escala de cinza preservando percepção luminosa.
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4 text-slate-700">
+                            <div>
+                                <strong>Fórmula aplicada</strong>
+                                <pre>gray = 0.299 * r + 0.587 * g + 0.114 * b
+→ [gray, gray, gray]</pre>
+                            </div>
+                            <div>
+                                <strong>Resultado esperado</strong>
+                                <p>Imagem monocromática equilibrada, boa preservação de contraste e detalhes sem cor.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 9: Conclusão -->
+                    <section class="slide w-full flex-shrink-0 px-6 py-12">
+                        <h3 class="text-2xl font-semibold mb-3 text-sky-700">Conclusão</h3>
+                        <p class="text-lg text-slate-700">Recriar filtros a partir de operações por pixel (matrizes,
+                            saturação/contraste e blending) demonstra como efeitos visuais populares são construídos.
+                            Esse conhecimento permite customizar e criar novos estilos programaticamente.</p>
+                        <ul class="mt-4 list-disc pl-5 text-slate-700">
+                            <li>Aprendizado: manipulação direta de ImageData, matrizes de cor e interpolação (mix).</li>
+                            <li>Extensões possíveis: adicionar modos de blending (multiply/overlay), LUTs e curvas para
+                                controle fino.</li>
+                        </ul>
+                    </section>
+
+                    <!-- Slide 10: Fim / CTA -->
+                    <section
+                        class="slide w-full flex-shrink-0 px-6 py-12 flex flex-col justify-center items-start gap-4">
+                        <h3 class="text-2xl font-semibold text-sky-700">Obrigado!</h3>
+                    </section>
+
+                </div>
+            </div>
+
+            <footer class="mt-6 flex items-center justify-between">
+                <div id="dots" class="flex gap-2"></div>
+                <div class="text-sm text-slate-500">Navegação: ← / → • Clique nos botões</div>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        const slidesInner = document.getElementById('slidesInner');
+        const slides = Array.from(slidesInner.children);
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const dots = document.getElementById('dots');
+        let idx = 0;
+
+        function buildDots() {
+            dots.innerHTML = '';
+            slides.forEach((s, i) => {
+                const d = document.createElement('div');
+                d.className = 'dot bg-sky-400/40';
+                if (i === idx) d.classList.add('bg-sky-600', 'opacity-100');
+                d.addEventListener('click', () => goTo(i));
+                dots.appendChild(d);
+            });
+        }
+
+        function update() {
+            const w = slides[0].getBoundingClientRect().width;
+            slidesInner.style.transform = `translateX(${-idx * w}px)`;
+            Array.from(dots.children).forEach((d, i) => {
+                d.classList.toggle('bg-sky-600', i === idx);
+                d.classList.toggle('opacity-100', i === idx);
+                d.classList.toggle('bg-sky-400/40', i !== idx);
+            });
+        }
+
+        function goTo(i) {
+            idx = Math.max(0, Math.min(slides.length - 1, i));
+            update();
+        }
+
+        nextBtn.addEventListener('click', () => goTo(idx + 1));
+        prevBtn.addEventListener('click', () => goTo(idx - 1));
+        window.addEventListener('resize', update);
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') goTo(idx + 1);
+            if (e.key === 'ArrowLeft') goTo(idx - 1);
+        });
+
+        buildDots();
+        update();
+    </script>
+</body>
+</html>
